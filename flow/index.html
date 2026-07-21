@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Mage-Flow is a compact 4B model family for high-quality image generation and instruction-based editing, with interactive 4-step inference.">
+  <meta name="keywords" content="Mage-Flow, Mage-Flow-Edit, text-to-image, image editing, diffusion transformer, native resolution, Mage-VAE">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="Mage-Flow: An Efficient Native-Resolution Foundation Model for Image Generation and Editing">
+  <meta property="og:description" content="Native-resolution generation, precise editing, and interactive 4-step inference in one compact model family.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="static/imgs/t2i_teaser.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" sizes="180x180" href="static/imgs/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="static/imgs/favicon.png">
+  <title>Mage-Flow: An Efficient Native-Resolution Foundation Model for Image Generation and Editing</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="stylesheet" href="static/css/result-first.css?v=26">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/js/glightbox.min.js"></script>
+  <script defer src="static/js/benchmark-data.js?v=2"></script>
+  <script defer src="static/js/result-first.js?v=7"></script>
+</head>
+<body>
+  <nav class="rf-nav" aria-label="Project navigation">
+    <div class="rf-nav-inner">
+      <a class="rf-brand-home" href="../">Mage</a>
+      <span class="rf-brand-slash" aria-hidden="true">/</span>
+      <div class="rf-project-switcher">
+        <button class="rf-project-trigger" type="button" aria-expanded="false" aria-haspopup="true">
+          Flow <span class="rf-chevron" aria-hidden="true">⌄</span>
+        </button>
+        <div class="rf-project-menu" role="menu">
+          <a href="../flow/" role="menuitem" aria-current="page"><strong>Mage-Flow</strong><span>Generation &amp; editing</span></a>
+          <a href="../vl/" role="menuitem"><strong>Mage-VL</strong><span>Multimodal understanding</span></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="rf-hero">
+      <div class="rf-container">
+        <h1 class="rf-report-title">
+          <span class="rf-report-model">Mage-Flow</span>
+          <span class="rf-report-subtitle">An Efficient Native-Resolution Foundation Model<br>for Image Generation and Editing</span>
+        </h1>
+        <p class="rf-report-description"><a href="#contributors">Microsoft Mage Team</a></p>
+        <div class="rf-actions">
+          <a class="rf-button" href="https://huggingface.co/collections/microsoft/mage" target="_blank" rel="noopener"><span class="rf-hf-icon" aria-hidden="true">🤗</span> Explore models</a>
+          <a class="rf-button" href="https://huggingface.co/spaces/microsoft/mage-flow" target="_blank" rel="noopener"><span class="rf-hf-icon" aria-hidden="true">🤗</span> Try</a>
+          <a class="rf-button" href="https://arxiv.org/abs/2607.19064" target="_blank" rel="noopener"><i class="ai ai-arxiv" aria-hidden="true"></i> Technical report</a>
+          <a class="rf-button" href="https://github.com/microsoft/Mage" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i> Code</a>
+        </div>
+
+        <div class="rf-hero-media" aria-label="Mage-Flow result highlights">
+          <figure class="rf-media-card">
+            <a class="glightbox" href="static/imgs/t2i_teaser.jpg" data-gallery="hero">
+              <img src="static/imgs/t2i_teaser.jpg" alt="Mage-Flow native-resolution text-to-image examples" fetchpriority="high">
+            </a>
+          </figure>
+          <figure class="rf-media-card">
+            <a class="glightbox" href="static/imgs/edit_showcase_1.jpg" data-gallery="hero">
+              <img src="static/imgs/edit_showcase_1.jpg" alt="Mage-Flow-Edit source images and edited outputs" fetchpriority="high">
+            </a>
+          </figure>
+        </div>
+      </div>
+    </header>
+
+    <section class="rf-metrics" aria-label="Headline results">
+      <div class="rf-container">
+        <div class="rf-metric-grid">
+          <div class="rf-metric"><strong>4B</strong><span>parameters</span></div>
+          <div class="rf-metric"><strong>0.59s</strong><span>Turbo generation</span></div>
+          <div class="rf-metric"><strong>1.02s</strong><span>Turbo editing</span></div>
+          <div class="rf-metric"><strong>4</strong><span>Turbo steps</span></div>
+          <div class="rf-metric"><strong>0.88</strong><span>Turbo GenEval</span></div>
+          <div class="rf-metric"><strong>8.271</strong><span>GEdit-EN</span></div>
+        </div>
+        <p class="rf-metric-note">Latency measured at 1024² on a single NVIDIA A100. Benchmark results follow the unified protocol in the technical report.</p>
+      </div>
+    </section>
+
+    <section class="section" id="abstract">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Abstract</h2>
+            <div class="content has-text-justified">
+              <p>Large-scale visual generators are increasingly capable but costly to train, fine-tune, and deploy. We introduce <strong>Mage-Flow</strong>, a compact 4B-scale generative stack for efficient text-to-image generation and instruction-based image editing. The stack is built from two co-designed components: <strong>Mage-VAE</strong>, a lightweight high-fidelity latent tokenizer, and a <strong>Native-Resolution Multimodal Diffusion Transformer</strong> trained with rectified flow matching. Mage-VAE uses one-step diffusion-style encoding and decoding with anchor-latent regularization, preserving the reconstruction quality of strong public VAEs while reducing tokenization cost by more than an order of magnitude. Together with native-resolution packing and stack-level CUDA kernel fusion, the stack supports flexible-resolution training and improves end-to-end training throughput by about 2.5×. Built on this foundation, we develop a complete model family with Base, RL-aligned, and Turbo variants for both generation and editing. Diffusion-NFT improves prompt following, text rendering, aesthetic quality, and editing fidelity, while few-step distillation with adversarial perceptual guidance produces 4-step Turbo models for low-latency inference. Despite its compact scale, Mage-Flow and Mage-Flow-Edit achieve competitive performance across standard generation and editing benchmarks. More importantly, the Turbo variants make high-resolution generation and editing practical for interactive use: at 1024² resolution on a single NVIDIA A100 GPU, Mage-Flow-Turbo generates an image in 0.59 s, and Mage-Flow-Edit-Turbo edits an image in 1.02 s, while maintaining a small memory footprint. These results show that careful tokenizer–backbone–system co-design can deliver strong high-resolution generation and editing within an efficient 4B model family.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rf-section rf-section-dark" id="performance">
+      <div class="rf-container">
+        <div class="feature-container rf-merged-features">
+          <div class="feature-tabs">
+            <div class="feature-tab" data-color="purple" role="button" tabindex="0" onclick="showFeature(0,'purple',event)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+              </svg>
+              <span>Full Family &amp; Speed</span>
+            </div>
+            <div class="feature-tab" data-color="blue" role="button" tabindex="0" onclick="showFeature(1,'blue',event)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 4v16"/>
+              </svg>
+              <span>Mage-VAE Tokenizer</span>
+            </div>
+            <div class="feature-tab" data-color="amber" role="button" tabindex="0" onclick="showFeature(2,'amber',event)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/>
+                <rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 17h7M17.5 14v7"/>
+              </svg>
+              <span>Native-Resolution MMDiT</span>
+            </div>
+          </div>
+
+          <div class="feature-content-wrapper">
+            <div class="feature-panel" data-color="purple">
+              <div class="feature-panel-title">Full family &amp; speed</div>
+              <p class="feature-panel-text">The same compact stack powers generation and editing, each available as Base, aligned, and 4-step Turbo variants. Stack-level optimization and quality-preserving distillation make high-resolution inference interactive.</p>
+              <div class="feature-stats rf-family-speed-stats">
+                <div class="feature-stat"><div class="feature-stat-num">0.59s</div><div class="feature-stat-lbl">Turbo generation</div></div>
+                <div class="feature-stat"><div class="feature-stat-num">1.02s</div><div class="feature-stat-lbl">Turbo editing</div></div>
+                <div class="feature-stat"><div class="feature-stat-num">18–20 GB</div><div class="feature-stat-lbl">Peak inference memory</div></div>
+              </div>
+              <div class="columns is-mobile" style="margin-top:6px">
+                <div class="column is-half"><a class="glightbox feature-panel-img" href="static/imgs/speed_generation.jpg" data-gallery="speed"><img src="static/imgs/speed_generation.jpg" alt="Generation quality, speed, and memory comparison" loading="lazy"></a></div>
+                <div class="column is-half"><a class="glightbox feature-panel-img" href="static/imgs/speed_editing.jpg" data-gallery="speed"><img src="static/imgs/speed_editing.jpg" alt="Editing quality, speed, and memory comparison" loading="lazy"></a></div>
+              </div>
+              <p class="feature-panel-cap">Quality vs. latency &amp; memory at 1024² on a single A100 — GenEval (generation, left) and GEdit-EN (editing, right). Mage-Flow sits at the fast, low-memory frontier.</p>
+            </div>
+
+            <div class="feature-panel" data-color="blue">
+              <div class="feature-panel-title">Mage-VAE — efficient latent tokenizer</div>
+              <p class="feature-panel-text">One-step encoding and decoding remove the high-resolution tokenizer bottleneck while preserving a generation-ready latent space. Mage-VAE matches strong reconstruction quality with <strong>~12× / ~22× fewer encode / decode MACs per pixel</strong>.</p>
+              <div class="feature-stats feature-stats-two">
+                <div class="feature-stat"><div class="feature-stat-num">~12×</div><div class="feature-stat-lbl">Fewer encode MACs</div></div>
+                <div class="feature-stat"><div class="feature-stat-num">~22×</div><div class="feature-stat-lbl">Fewer decode MACs</div></div>
+              </div>
+              <a class="glightbox feature-panel-img" href="static/imgs/mage_vae.jpg" data-gallery="hl"><img src="static/imgs/mage_vae.jpg" alt="Mage-VAE architecture" loading="lazy"></a>
+              <p class="feature-panel-cap">One-step diffusion encode/decode with anchor-latent regularization.</p>
+            </div>
+
+            <div class="feature-panel" data-color="amber">
+              <div class="feature-panel-title">Native-Resolution Multimodal DiT</div>
+              <p class="feature-panel-text">Variable-length image and text packing avoids rigid resolution buckets and unnecessary padding. One shared 4B backbone supports flexible canvases from <strong>512 to 2048 pixels</strong>, including extreme aspect ratios, while packed CFG evaluates both branches in one forward pass.</p>
+              <a class="glightbox feature-panel-img" href="static/imgs/nr_mmdit.jpg" data-gallery="hl"><img src="static/imgs/nr_mmdit.jpg" alt="Native-resolution MMDiT architecture" loading="lazy"></a>
+              <p class="feature-panel-cap">Packed native-resolution image and text tokens through the shared NR-MMDiT.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rf-section rf-section-soft" aria-labelledby="benchmarks-title">
+      <div class="rf-container">
+        <div class="rf-section-head rf-section-head-single">
+          <h2 id="benchmarks-title">Benchmark highlights</h2>
+        </div>
+
+        <div class="rf-score-grid">
+          <article class="rf-score-card">
+            <div class="rf-score-top"><h3>Text-to-image generation</h3><span class="rf-score-badge">4 steps</span></div>
+            <div class="rf-score-metrics">
+              <div class="rf-score-metric"><div class="rf-score-number">0.88</div><div class="rf-score-label">GenEval · Mage-Flow-Turbo</div></div>
+              <div class="rf-score-metric"><div class="rf-score-number">0.873</div><div class="rf-score-label">CVTG-2K · Mage-Flow-Turbo</div></div>
+            </div>
+            <table class="rf-mini-table" aria-label="Selected generation benchmark comparison">
+              <thead><tr><th>Model</th><th>Params</th><th>GenEval</th><th>CVTG-2K</th></tr></thead>
+              <tbody>
+                <tr class="ours"><td>Mage-Flow-Turbo</td><td>4B</td><td>0.88</td><td>0.873</td></tr>
+                <tr><td>Z-Image-Turbo</td><td>6B</td><td>0.82</td><td>0.859</td></tr>
+                <tr><td>Qwen-Image</td><td>20B</td><td>0.87</td><td>0.829</td></tr>
+                <tr><td>FLUX.2-Klein-9B</td><td>9B</td><td>0.86</td><td>0.424</td></tr>
+              </tbody>
+            </table>
+          </article>
+          <article class="rf-score-card">
+            <div class="rf-score-top"><h3>Instruction-based editing</h3><span class="rf-score-badge">4 steps</span></div>
+            <div class="rf-score-metrics">
+              <div class="rf-score-metric"><div class="rf-score-number">8.271</div><div class="rf-score-label">GEdit-EN · Edit-Turbo</div></div>
+              <div class="rf-score-metric"><div class="rf-score-number">8.264</div><div class="rf-score-label">GEdit-CN · Edit-Turbo</div></div>
+            </div>
+            <table class="rf-mini-table" aria-label="Selected editing benchmark comparison">
+              <thead><tr><th>Model</th><th>Params</th><th>GEdit-EN</th><th>GEdit-CN</th></tr></thead>
+              <tbody>
+                <tr class="ours"><td>Mage-Flow-Edit-Turbo</td><td>4B</td><td>8.271</td><td>8.264</td></tr>
+                <tr><td>FireRed-Image-Edit-1.0</td><td>20B</td><td>7.943</td><td>7.887</td></tr>
+                <tr><td>JoyAI-Image-Edit</td><td>16B</td><td>8.276</td><td>8.125</td></tr>
+                <tr><td>Qwen-Image-Edit-2511</td><td>20B</td><td>7.877</td><td>7.819</td></tr>
+              </tbody>
+            </table>
+          </article>
+        </div>
+
+        <details class="rf-details">
+          <summary>View more text-to-image results</summary>
+          <div class="rf-details-body">
+            <table class="table is-striped is-hoverable is-fullwidth" id="t2i-table" aria-label="README-aligned text-to-image benchmark table">
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+            <p class="rf-footnote">20 models · 13 columns. GenEval, CVTG-2K, OneIG, and LongText use 0–1 scales; DPG and TIIF use 0–100 scales.</p>
+          </div>
+        </details>
+
+        <details class="rf-details">
+          <summary>View more image editing results</summary>
+          <div class="rf-details-body">
+            <table class="table is-striped is-hoverable is-fullwidth" id="edit-table" aria-label="README-aligned image-editing benchmark table">
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+            <p class="rf-footnote">20 models · 9 columns. ImgEdit uses a 0–5 scale, GEdit a 0–10 scale, and TextEdit a 0–25 scale.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="rf-section" id="showcase">
+      <div class="rf-container">
+        <div class="rf-section-head rf-section-head-single">
+          <h2>Qualitative results</h2>
+        </div>
+
+        <div class="rf-gallery-tabs">
+          <div class="rf-gallery-group">
+            <div class="rf-gallery-group-head"><h3>Text-to-image</h3></div>
+            <div class="rf-image-strip-shell">
+              <div class="rf-image-strip rf-image-strip-t2i" tabindex="0" aria-label="Text-to-image result walls; scroll horizontally for more">
+                <figure class="rf-image-strip-item"><img src="static/imgs/t2i_general.jpg" width="2400" height="3214" alt="General and imaginative scenes" decoding="async"></figure>
+                <figure class="rf-image-strip-item"><img data-src="static/imgs/t2i_cuisine.jpg" width="2400" height="3165" alt="Cuisine and still-life generations" decoding="async"></figure>
+                <figure class="rf-image-strip-item"><img data-src="static/imgs/t2i_portrait.jpg" width="2400" height="3285" alt="Portrait generations" decoding="async"></figure>
+                <figure class="rf-image-strip-item"><img data-src="static/imgs/t2i_text_en.jpg" width="2400" height="3631" alt="English text rendering examples" decoding="async"></figure>
+                <figure class="rf-image-strip-item"><img data-src="static/imgs/t2i_text_zh.jpg" width="2400" height="3072" alt="Chinese text rendering examples" decoding="async"></figure>
+              </div>
+            </div>
+          </div>
+
+          <div class="rf-gallery-group">
+            <div class="rf-gallery-group-head"><h3>Instruction-based editing</h3></div>
+            <div class="rf-image-strip-shell">
+              <div class="rf-image-strip rf-image-strip-edit" tabindex="0" aria-label="Image-editing result walls; scroll horizontally for more">
+                <figure class="rf-image-strip-item"><img src="static/imgs/edit_showcase_2.jpg" width="2600" height="3860" alt="Mage-Flow-Edit capability showcase" decoding="async"></figure>
+                <figure class="rf-image-strip-item"><img data-src="static/imgs/edit_content.jpg" width="2400" height="3600" alt="Content and object editing" decoding="async"></figure>
+                <figure class="rf-image-strip-item"><img data-src="static/imgs/edit_scene_subject.jpg" width="2400" height="3600" alt="Scene, subject, and camera editing" decoding="async"></figure>
+                <figure class="rf-image-strip-item"><img data-src="static/imgs/edit_appearance.jpg" width="2400" height="3600" alt="Appearance and artistic edits" decoding="async"></figure>
+                <figure class="rf-image-strip-item"><img data-src="static/imgs/edit_human_creative.jpg" width="2400" height="3600" alt="Human-centered and creative edits" decoding="async"></figure>
+                <figure class="rf-image-strip-item"><img data-src="static/imgs/edit_lowlevel.jpg" width="2400" height="3600" alt="Low-level and conditional reconstruction" decoding="async"></figure>
+                <figure class="rf-image-strip-item"><img data-src="static/imgs/edit_restoration.jpg" width="2400" height="3600" alt="Image degradation and restoration" decoding="async"></figure>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rf-diversity-explorer" aria-label="Interactive editing diversity explorer">
+          <div class="rf-diversity-stage">
+            <figure class="rf-diversity-pane">
+              <span class="rf-diversity-badge rf-diversity-badge-source">SOURCE</span>
+              <img src="static/imgs/diversity_dog/source.jpg" width="1024" height="1024" alt="Source dog image" loading="lazy" decoding="async">
+            </figure>
+            <figure class="rf-diversity-pane">
+              <span class="rf-diversity-badge" id="rf-diversity-result-label">BACKGROUND CHANGE</span>
+              <img id="rf-diversity-result" src="static/imgs/diversity_dog/background_change.jpg" width="1024" height="1024" alt="Background change editing result" loading="lazy" decoding="async">
+            </figure>
+          </div>
+          <div class="rf-diversity-controls" role="group" aria-label="Choose an editing type">
+            <button class="rf-diversity-button is-active" type="button" aria-pressed="true" data-label="Background change" data-src="static/imgs/diversity_dog/background_change.jpg">Background change</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Color alteration" data-src="static/imgs/diversity_dog/color_alteration.jpg">Color alteration</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Count change" data-src="static/imgs/diversity_dog/count_change.jpg">Count change</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Extract" data-src="static/imgs/diversity_dog/extract.jpg">Extract</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Canny" data-src="static/imgs/diversity_dog/canny.jpg">Canny</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Colorization" data-src="static/imgs/diversity_dog/colorization.jpg">Colorization</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Depth" data-src="static/imgs/diversity_dog/depth.jpg">Depth</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="HED" data-src="static/imgs/diversity_dog/hed.jpg">HED</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Normal map" data-src="static/imgs/diversity_dog/normal_map.jpg">Normal map</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Segmentation" data-src="static/imgs/diversity_dog/segmentation.jpg">Segmentation</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Sketch" data-src="static/imgs/diversity_dog/sketch.jpg">Sketch</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Material alteration" data-src="static/imgs/diversity_dog/material_alteration.jpg">Material alteration</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Motion change" data-src="static/imgs/diversity_dog/motion_change.jpg">Motion change</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Style change" data-src="static/imgs/diversity_dog/style_change.jpg">Style change</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Subject addition" data-src="static/imgs/diversity_dog/subject_addition.jpg">Subject addition</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Subject removal" data-src="static/imgs/diversity_dog/subject_removal.jpg">Subject removal</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Subject replacement" data-src="static/imgs/diversity_dog/subject_replacement.jpg">Subject replacement</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Tone transfer" data-src="static/imgs/diversity_dog/tone_transfer.jpg">Tone transfer</button>
+            <button class="rf-diversity-button" type="button" aria-pressed="false" data-label="Viewpoint" data-src="static/imgs/diversity_dog/viewpoint.jpg">Viewpoint</button>
+          </div>
+          <p class="caption rf-diversity-caption">Editing diversity — select an edit type to compare the shared source image with the corresponding Mage-Flow-Edit result.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section rf-contributors-section" id="contributors">
+      <div class="container is-max-desktop content has-text-centered">
+        <h2 class="title is-3">Contributors</h2>
+        <div class="rf-publication-authors" aria-label="Mage-Flow contributors">
+          <p class="rf-author-list">
+            <span class="rf-author"><a href="https://xinjie-q.github.io/" target="_blank" rel="noopener">Xinjie Zhang<sup>*†</sup></a></span>,
+            <span class="rf-author"><a href="https://scholar.google.com/citations?user=0mwuIw8AAAAJ&amp;hl=en" target="_blank" rel="noopener">Peng Zhang<sup>*</sup></a></span>,
+            <span class="rf-author">Shicheng Zheng<sup>*</sup></span>,
+            <span class="rf-author"><a href="https://github.com/Jinghao-Guo" target="_blank" rel="noopener">Jinghao Guo<sup>*</sup></a></span>,
+            <span class="rf-author"><a href="https://scholar.google.com/citations?user=ObkbCWkAAAAJ&amp;hl=zh-CN" target="_blank" rel="noopener">Zhaoyang Jia<sup>*</sup></a></span>,
+            <span class="rf-author">Yifei Shen<sup>*</sup></span>,
+            <span class="rf-author"><a href="https://www.microsoft.com/en-us/research/people/xunguo/" target="_blank" rel="noopener">Xun Guo</a></span>,
+            <span class="rf-author"><a href="https://loyuxr.github.io/" target="_blank" rel="noopener">Yuxuan Luo</a></span>,
+            <span class="rf-author"><a href="https://www.microsoft.com/en-us/research/people/jiahali/" target="_blank" rel="noopener">Jiahao Li</a></span>,
+            <span class="rf-author"><a href="https://www.microsoft.com/en-us/research/people/wenxie/" target="_blank" rel="noopener">Wenxuan Xie</a></span>,
+            <span class="rf-author"><a href="https://pufanyi.com/" target="_blank" rel="noopener">Fanyi Pu</a></span>,
+            <span class="rf-author"><a href="https://www.microsoft.com/en-us/research/people/xiaoyizhang/" target="_blank" rel="noopener">Xiaoyi Zhang</a></span>,
+            <span class="rf-author"><a href="https://kcz358.github.io/" target="_blank" rel="noopener">Kaichen Zhang</a></span>,
+            <span class="rf-author"><a href="https://zongyuguo.github.io/" target="_blank" rel="noopener">Zongyu Guo</a></span>,
+            <span class="rf-author">Tianci Bi</span>,
+            <span class="rf-author"><a href="https://scholar.google.com/citations?user=shLKvwcAAAAJ&amp;hl=en" target="_blank" rel="noopener">Dongnan Gui</a></span>,
+            <span class="rf-author"><a href="https://www.liuzhening.top/" target="_blank" rel="noopener">Zhening Liu</a></span>,
+            <span class="rf-author">Zimo Wen</span>,
+            <span class="rf-author">Zihan Zheng</span>,
+            <span class="rf-author"><a href="https://senqiaoyang.com/" target="_blank" rel="noopener">Senqiao Yang</a></span>,
+            <span class="rf-author"><a href="https://pableeto.github.io/" target="_blank" rel="noopener">Xiao Li</a></span>,
+            <span class="rf-author"><a href="https://jingluw.github.io/" target="_blank" rel="noopener">Jinglu Wang</a></span>,
+            <span class="rf-author"><a href="https://www.microsoft.com/en-us/research/people/libin/" target="_blank" rel="noopener">Bin Li</a></span>,
+            <span class="rf-author"><a href="https://www.microsoft.com/en-us/research/people/yanlu/" target="_blank" rel="noopener">Yan Lu</a></span>
+          </p>
+          <p class="rf-author-notes"><sup>*</sup> Equal Contribution. <span aria-hidden="true">·</span> <sup>†</sup> Project Lead (<a href="mailto:xinjiezhang@microsoft.com">xinjiezhang@microsoft.com</a>).</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="BibTeX">
+      <div class="container is-max-desktop content">
+        <h2 class="title is-3 has-text-centered">BibTeX 📚</h2>
+        <pre><code>@article{zhang2026mageflow,
+  title={Mage-Flow: An Efficient Native-Resolution Foundation Model for Image Generation and Editing},
+  author={Zhang, Xinjie and Zhang, Peng and Zheng, Shicheng and Guo, Jinghao and Jia, Zhaoyang and Shen, Yifei and Guo, Xun and Luo, Yuxuan and Li, Jiahao and Xie, Wenxuan and Pu, Fanyi and Zhang, Xiaoyi and Zhang, Kaichen and Guo, Zongyu and Bi, Tianci and Gui, Dongnan and Liu, Zhening and Wen, Zimo and Zheng, Zihan and Yang, Senqiao and Li, Xiao and Wang, Jinglu and Li, Bin and Lu, Yan},
+  journal={arXiv preprint arXiv:2607.19064},
+  year={2026}
+}</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rf-footer">
+    <div class="rf-container rf-footer-inner">
+      <div>Microsoft Mage Team · 2026</div>
+      <span><a href="https://go.microsoft.com/fwlink/?LinkId=521839" target="_blank" rel="noopener">Privacy</a> · Page template lineage: <a href="https://nerfies.github.io" target="_blank" rel="noopener">Nerfies</a></span>
+    </div>
+  </footer>
+</body>
+</html>
