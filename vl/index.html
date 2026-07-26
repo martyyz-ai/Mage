@@ -1,21 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="description" content="Mage-VL: A Codec-Native Proactive Streaming Multimodal Foundation Model">
+  <meta name="description" content="Mage-VL: An Efficient Codec-Native Streaming Multimodal Foundation Model">
   <meta name="keywords" content="Mage-VL, vision-language model, video understanding, codec-native, streaming VLM, Mage-ViT">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="Mage-VL: An Efficient Codec-Native Streaming Multimodal Foundation Model">
+  <meta property="og:description" content="A codec-native VLM that reads video the way a codec does, with bio-inspired proactive streaming.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="static/imgs/teaser.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/png" sizes="180x180" href="static/imgs/favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="static/imgs/favicon.png">
-  <title>Mage-VL: A Codec-Native Proactive Streaming Multimodal Foundation Model</title>
+  <title>Mage-VL: An Efficient Codec-Native Streaming Multimodal Foundation Model</title>
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
   <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="static/css/index.css">
+  <link rel="stylesheet" href="static/css/result-first.css?v=26">
   <link rel="stylesheet" href="static/css/family-nav.css?v=7">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css"/>
+
   <script defer src="static/js/family-nav.js?v=1"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/js/glightbox.min.js"></script>
+
+  <style>
+    /* Best / second-best highlighting in performance tables (paper color scheme) */
+    #vid-table td.best, #ovo-table td.best, #img-table td.best { background-color:#B3CDE3 !important; font-weight:700; }
+    #vid-table td.second, #ovo-table td.second, #img-table td.second { background-color:#E0ECF4 !important; }
+    .perf-swatch { padding:0 .4em; border-radius:3px; }
+    .perf-swatch.best { background-color:#B3CDE3; font-weight:700; }
+    .perf-swatch.second { background-color:#E0ECF4; }
+  </style>
 </head>
 <body>
+
   <nav class="rf-nav" aria-label="Project navigation">
     <div class="rf-nav-inner">
       <a class="rf-brand-home" href="../">Mage</a>
@@ -32,23 +56,504 @@
     </div>
   </nav>
 
-  <main class="vl-coming-page">
-    <section class="hero">
-      <div class="hero-body">
-        <div class="container is-max-desktop">
-          <div class="columns is-centered">
-            <div class="column has-text-centered">
-              <h1 class="title is-2 publication-title rf-report-title">
-                <span class="rf-report-model">Mage-VL</span>
-                <span class="rf-report-subtitle">A Codec-Native Proactive Streaming<br>Multimodal Foundation Model</span>
-              </h1>
-              <p class="vl-coming-description">Microsoft Mage Team</p>
-              <p class="vl-coming-soon">COMING SOON</p>
-            </div>
-          </div>
+  <main>
+    <header class="rf-hero">
+      <div class="rf-container">
+        <h1 class="rf-report-title">
+          <span class="rf-report-model">Mage-VL</span>
+          <span class="rf-report-subtitle">An Efficient Codec-Native Streaming<br>Multimodal Foundation Model</span>
+        </h1>
+        <p class="rf-report-description"><a href="#contributors">Microsoft Mage Team</a></p>
+        <div class="rf-actions">
+          <a class="rf-button" href="https://huggingface.co/microsoft/Mage-VL" target="_blank" rel="noopener"><span class="rf-hf-icon" aria-hidden="true">🤗</span> Mage-VL</a>
+          <a class="rf-button" href="https://huggingface.co/microsoft/Mage-ViT" target="_blank" rel="noopener"><span class="rf-hf-icon" aria-hidden="true">🤗</span> Mage-ViT</a>
+          <a class="rf-button" href="https://github.com/microsoft/Mage/blob/main/assets/mage_vl_tech_report.pdf" target="_blank" rel="noopener"><i class="ai ai-arxiv" aria-hidden="true"></i> Technical report</a>
+          <a class="rf-button" href="https://github.com/microsoft/Mage" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i> Code</a>
+        </div>
+
+        <div class="rf-hero-media is-single" aria-label="Mage-VL overview">
+          <figure class="rf-media-card">
+            <a class="glightbox" href="static/imgs/teaser.png" data-gallery="hero">
+              <img src="static/imgs/teaser.png" alt="Mage-VL benchmark performance and streaming video understanding overview" fetchpriority="high">
+            </a>
+          </figure>
+        </div>
+        <p class="caption" style="margin-top:10px">Mage-VL: codec-native visual representations for efficient multimodal understanding — benchmark performance against Qwen3-VL-4B, Phi-4-Reasoning-Vision-15B and Phi-4-MM-5.6B, and the streaming pipeline from live input to codec-native token selection and online multimodal understanding. Click to expand.</p>
+      </div>
+    </header>
+
+<!-- ══ ABSTRACT ══ -->
+<section class="section">
+  <div class="container is-max-desktop" style="margin-bottom:2vh">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+          Standard Vision-Language Models (VLMs) suffer from <strong>Moravec's paradox</strong>: they excel at complex offline visual reasoning, but fail and suffer computational inefficiency on simple streaming perception tasks. We present <strong>Mage-VL</strong>, an efficient codec-native streaming foundation model for real-time multimodal understanding and interaction. At its core, our custom tokenizer, <strong>Mage-ViT</strong>, replaces uniform frame sampling by selectively encoding dynamic, entropy-rich regions using motion vectors and residual energy across sparse <strong>anchor (I)</strong> and <strong>predicted (P)</strong> frames. Operating at a 16×16 patch level, this reduces visual token consumption by <strong>over 75%</strong> while preserving spatio-temporal context. Trained from scratch on merely <strong>100M unlabeled images and videos</strong>, Mage-ViT matches or outperforms flagship encoders trained on billions of image–text pairs. We establish <strong>AI4AI</strong> data pipelines, encompassing prompt-code joint optimization for multimodal captioning and AI-driven performance diagnosis to guide training recipes. Furthermore, through a bio-inspired dual-system architecture—a lightweight <strong>System 1</strong> event gate and a causal <strong>System 2</strong> decoder—Mage-VL enables proactive streaming perception. Extensive evaluations show that <strong>Mage-VL-4B</strong> matches Qwen3-VL-4B on static tasks while achieving strong gains in video understanding and 2D/3D spatial reasoning with <strong>up to 3.5× wall-clock inference speedup</strong>, comprehensively surpassing the 15B Phi-4-Reasoning-Vision baseline. Beyond model artifacts, we deliver <strong>seven key empirical findings</strong> covering pre-training data efficiency, variable-resolution scaling, codec system acceleration, VideoQA SFT redundancy, motion-spatial synergy, AI4AI data pipelines, and Zero-Vision SFT for multimodal RL.
+          </p>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
+
+<!-- ══ HIGHLIGHTS ══ -->
+<section class="section" style="padding:2.5rem 0">
+<div class="container is-max-desktop">
+  <div class="feature-container">
+
+    <div class="feature-tabs">
+      <div class="feature-tab" data-color="blue" onclick="showFeature(0,'blue',event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M8 5v14"/>
+        </svg>
+        <span>Codec-Native Encoder</span>
+      </div>
+      <div class="feature-tab" data-color="purple" onclick="showFeature(1,'purple',event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+        </svg>
+        <span>Proactive Streaming</span>
+      </div>
+      <div class="feature-tab" data-color="amber" onclick="showFeature(2,'amber',event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="12" cy="5" rx="8" ry="2.6"/><path d="M4 5v6c0 1.44 3.58 2.6 8 2.6s8-1.16 8-2.6V5"/>
+          <path d="M4 11v6c0 1.44 3.58 2.6 8 2.6s8-1.16 8-2.6v-6"/>
+        </svg>
+        <span>AI4AI Data Pipeline</span>
+      </div>
+    </div>
+
+    <div class="feature-content-wrapper">
+
+      <div class="feature-panel" data-color="blue">
+        <div class="feature-panel-title">Codec-native perception</div>
+        <p class="feature-panel-text">Instead of offline uniform frame sampling with a frozen encoder, Mage-VL reads video the way a codec does. Each stream is split into <strong>anchor (I) frames</strong> (kept in full) and <strong>predicted (P) frames</strong> (only motion-salient patches kept) on a <strong>16×16 grid</strong>. A single per-patch importance interface is <strong>codec-agnostic</strong> — it accepts a traditional codec (H.264/HEVC motion + residual) or a neural codec (DCVC-RT rate map) with no change to the encoder — cutting visual tokens by <strong>over 75%</strong> for <strong>up to 3.5× faster</strong> inference.</p>
+        <a class="glightbox feature-panel-img" href="static/imgs/codec_patch.png" data-gallery="hl">
+          <img src="static/imgs/codec_patch.png" loading="lazy"/>
+        </a>
+        <p class="feature-panel-cap">Codec-driven patch selection: HEVC (motion + residual) or DCVC-RT (entropy) → per-frame significance map → top-k patches packed into canvases for Mage-ViT.</p>
+      </div>
+
+      <div class="feature-panel" data-color="purple">
+        <div class="feature-panel-title">Bio-inspired proactive streaming</div>
+        <p class="feature-panel-text">A single-model <strong>System 1 &amp; System 2</strong> design gives low-latency, proactive responses to continuous video. A lightweight <strong>System 1 cognition gate</strong> watches each rolling codec window and decides <em>when</em> to speak; only when an event is response-worthy does it trigger the full <strong>System 2</strong> VLM to generate — no multi-agent pipeline. It stays silent through routine play and speaks the moment an event completes, generalizing to real broadcasts (e.g. 2026 World Cup matches).</p>
+        <a class="glightbox feature-panel-img" href="static/imgs/framework.png" data-gallery="hl">
+          <img src="static/imgs/framework.png" loading="lazy"/>
+        </a>
+        <p class="feature-panel-cap">Proactive streaming: Mage-ViT features feed an event gate that stays silent until a response-worthy moment, then triggers the LLM decoder to produce event-conditioned commentary.</p>
+      </div>
+
+      <div class="feature-panel" data-color="amber">
+        <div class="feature-panel-title">AI4AI data pipeline</div>
+        <p class="feature-panel-text">The training data refines <em>itself</em> through an agentic closed loop. A frozen <strong>Qwen3-VL-32B</strong> captions images; a <strong>GPT-5 rubric scorer</strong> grades each caption on completeness, redundancy, coherence, and OCR fidelity; and a <strong>GitHub Copilot</strong> agent co-designs the prompt <em>and</em> harness code (e.g. rendering timestamp overlays so the captioner anchors events by OCR) under a human validation gate. Ten refine–verify iterations lift every downstream OCR / document / chart / perception benchmark (<strong>+5.6 InfoVQA</strong>, <strong>+3.8 OCRBench</strong>, <strong>+3.8 RealWorldQA</strong>); the same paradigm also drives Stage-3 data diagnostics, and this work inspired SkillOpt-Lite.</p>
+        <a class="glightbox feature-panel-img" href="static/imgs/ai4ai_pipeline.png" data-gallery="hl">
+          <img src="static/imgs/ai4ai_pipeline.png" loading="lazy"/>
+        </a>
+        <p class="feature-panel-cap">AI4AI closed loop: frozen Qwen3-VL-32B captions → GPT-5 rubric scorer → Copilot prompt/code modifier → validation gate → improved prompt P<sub>t+1</sub>.</p>
+
+        <p class="feature-panel-text" style="margin-top:14px"><strong>Emergent behavior in video caption pipeline.</strong> During pipeline iteration, the evaluation sub-agent identified that GPT-4.1 struggled with precise temporal localization when relying solely on generic text prompts. To resolve this, the harness code renders sequential timestamp overlays directly onto sampled frames, while the prompt guides the model to anchor events via visual OCR. This code–prompt co-design converts implicit temporal tracking into a visual grounding task, reducing temporal hallucinations and improving caption consistency across long videos.</p>
+
+        <p class="feature-panel-text" style="margin-top:10px"><strong>AI-guided training diagnostics &amp; recipe optimization.</strong> The same AI4AI loop also shaped our training recipe: the evaluation agent surfaced weaknesses in temporal localization — remedied by supplementing high-quality grounding data — and revealed that more frames consistently boost long-video performance, whereas dedicated long-video SFT and resolutions beyond 384 yield only marginal gains. Guided by these findings, we adopt 384-pixel inputs, set Stage-3 temporal length to 384 frames, and raise the RoPE base frequency ($\theta$) to 8M for stable long-context modeling.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══ STREAMMIND DEMO ══ -->
+<section class="section stream-demo" id="streammind-demo">
+  <div class="container is-max-widescreen">
+    <div class="has-text-centered stream-demo-head">
+      <span class="stream-kicker">LIVE VIDEO · PROACTIVE RESPONSES</span>
+      <h2 class="title is-3">Proactive Streaming in the Wild</h2>
+      <p>
+        Mage-VL watches continuously, stays quiet when nothing needs saying, and
+        speaks when the event gate detects a response-worthy moment. Choose a demo
+        and play the video to see each response appear at the moment it is triggered.
+      </p>
+    </div>
+
+    <div class="stream-demo-tabs" role="tablist" aria-label="Streaming demos">
+      <button class="stream-demo-tab active" data-demo="0" type="button"><b>1</b><span>World Cup</span></button>
+      <button class="stream-demo-tab" data-demo="1" type="button"><b>2</b><span>Culture &amp; Travel</span></button>
+      <button class="stream-demo-tab" data-demo="2" type="button"><b>3</b><span>Inside the Cockpit</span></button>
+    </div>
+
+    <div class="stream-layout">
+      <div class="stream-player-wrap">
+        <video id="streammind-video" controls playsinline preload="metadata">
+          <source src="static/videos/world-cup-streaming.mp4" type="video/mp4">
+          Your browser does not support MP4 video.
+        </video>
+        <div class="stream-player-note">
+          <strong id="stream-demo-title">England vs. Argentina · 2026 World Cup</strong>
+          <span id="stream-demo-meta">03:00 · codec backend · 30-second causal windows</span>
+        </div>
+      </div>
+
+      <div class="stream-transcript-wrap">
+        <div class="stream-transcript-head">
+          <span><i class="fas fa-wave-square"></i> Mage-VL live transcript</span>
+          <span id="stream-clock">00:00</span>
+        </div>
+        <div class="stream-events" id="stream-transcript" aria-live="polite"></div>
+        <div class="stream-waiting" id="stream-waiting">
+          <span class="stream-pulse"></span>
+          Watching the stream. Mage-VL is silent.
+        </div>
+      </div>
+    </div>
+
+    <p class="stream-method">
+      Raw model outputs from <code>Microsoft/Mage-VL</code>,
+      <code>--video_backend codec</code>, <code>--segment_sec 30</code>,
+      followed by standard Transformers <code>generate()</code> on the current segment.
+    </p>
+  </div>
+</section>
+
+<!-- ══ PERFORMANCE ══ -->
+<section class="hero is-light is-small">
+  <div class="hero-body has-text-centered">
+    <h1 class="title is-2">Performance 📊</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="margin-bottom:2vh">
+    <div class="columns is-centered">
+      <div class="column is-full has-text-centered content">
+
+        <p style="max-width:860px;margin:0 auto 1.2rem;color:#555">
+          Mage-VL-4B <strong>matches Qwen3-VL-4B on general VQA</strong> while <strong>outperforming it on spatial intelligence and video understanding</strong>, and comprehensively surpasses the much larger Phi-4-R-V-15B. Higher is better; per row, the <span class="perf-swatch best">best</span> and <span class="perf-swatch second">second-best</span> results are shaded.
+        </p>
+
+        <h2 class="title is-4">Video Understanding &amp; Temporal Grounding</h2>
+        <div class="table-container m-2">
+          <table class="table is-striped is-hoverable is-fullwidth" id="vid-table">
+            <thead>
+              <tr><th>Benchmark</th><th>Mage-VL-4B</th><th>Qwen3-VL-4B</th><th>Phi-4-MM-5.6B</th><th>Phi-4-R-V-15B</th></tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="5" style="text-align:left;font-style:italic;background:#fafafa">Video QA</td></tr>
+              <tr><td>MV-Bench</td><td class="second">65.1</td><td class="best">66.7</td><td>44.9</td><td>49.2</td></tr>
+              <tr><td>NextQA</td><td class="best">83.1</td><td class="second">79.8</td><td>54.1</td><td>69.0</td></tr>
+              <tr><td>VideoMME</td><td class="best">64.0</td><td class="second">59.7</td><td>44.7</td><td>55.3</td></tr>
+              <tr><td>LongVideoBench</td><td class="best">61.3</td><td class="second">57.7</td><td>41.14</td><td>51.2</td></tr>
+              <tr><td>LVBench</td><td class="best">41.8</td><td class="second">39.2</td><td>25.31</td><td>34.4</td></tr>
+              <tr><td>MLVU-dev</td><td class="best">68.7</td><td class="second">61.5</td><td>44.18</td><td>51.8</td></tr>
+              <tr><td>VideoMME (w/ sub.)</td><td class="second">66.3</td><td class="best">70.2</td><td>45.4</td><td>58.3</td></tr>
+              <tr><td>VideoMME-V2</td><td class="second">24.3</td><td class="best">24.4</td><td>19.2</td><td>23.9</td></tr>
+              <tr><td>VideoEval-Pro</td><td class="best">45.2</td><td class="second">20.7</td><td>14.35</td><td>16.8</td></tr>
+              <tr><td>JumpScore</td><td class="best">45.60</td><td class="second">3.82</td><td>3.61</td><td>1.53</td></tr>
+              <tr><td>MMOU-Test-Mini</td><td class="second">39.3</td><td>38.1</td><td>32.22</td><td class="best">51.9</td></tr>
+              <tr><td colspan="5" style="text-align:left;font-style:italic;background:#fafafa">Temporal grounding</td></tr>
+              <tr><td>Timelens-Charades</td><td class="best">50.7</td><td class="second">43.1</td><td>4.09</td><td>20.6</td></tr>
+              <tr><td>Timelens-ActivityNet</td><td class="best">45.4</td><td class="second">28.4</td><td>2.03</td><td>23.0</td></tr>
+              <tr><td>Timelens-QVHighlight</td><td class="best">57.4</td><td class="second">34.9</td><td>2.47</td><td>11.6</td></tr>
+              <tr><td colspan="5" style="text-align:left;font-style:italic;background:#fafafa">Spatial reasoning</td></tr>
+              <tr><td>VSI-Bench</td><td class="best">64.3</td><td class="second">53.3</td><td>24.09</td><td>25.5</td></tr>
+              <tr><td colspan="5" style="text-align:left;font-style:italic;background:#fafafa">Tracking (J&amp;F)</td></tr>
+              <tr><td>Ref-DAVIS17</td><td class="best">25.83</td><td class="second">7.48</td><td>3.14</td><td>2.15</td></tr>
+              <tr><td>MeViS-ValidU</td><td class="best">22.55</td><td>3.16</td><td class="second">10.28</td><td>1.53</td></tr>
+              <tr><td>ReasonVOS</td><td class="best">17.76</td><td>9.66</td><td>9.50</td><td class="second">9.77</td></tr>
+              <tr><td>Ref-YT-VOS</td><td class="best">25.57</td><td class="second">5.28</td><td>8.64</td><td>3.85</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+
+        <h2 class="title is-4" style="margin-top:2rem">Proactive Streaming on OVO-Bench</h2>
+        <p style="max-width:860px;margin:0 auto .8rem;color:#555;font-size:.9rem">
+          OVO-Bench measures online video understanding under Real-Time Visual Perception and Backward Tracing. <span style="white-space:nowrap">&dagger; Qwen2.5-VL-7B + HERMES (4K tokens).</span> Baseline results and table structure follow SimpleStream.
+        </p>
+        <div class="table-container m-2">
+          <table class="table is-striped is-hoverable is-fullwidth" id="ovo-table">
+            <thead>
+              <tr>
+                <th rowspan="2" style="text-align:left">Model</th><th rowspan="2">#Frames</th>
+                <th colspan="7">Real-Time Visual Perception</th>
+                <th colspan="4">Backward Tracing</th>
+                <th rowspan="2">Avg.</th>
+              </tr>
+              <tr>
+                <th>OCR</th><th>ACR</th><th>ATR</th><th>STU</th><th>FPD</th><th>OJR</th><th>Avg.</th>
+                <th>EPM</th><th>ASI</th><th>HLD</th><th>Avg.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style='text-align:left'>Human</td><td>--</td><td>94.0</td><td>92.6</td><td>94.8</td><td>92.7</td><td>91.1</td><td>94.0</td><td>93.2</td><td>92.6</td><td>93.0</td><td>91.4</td><td>92.3</td><td>92.77</td></tr>
+              <tr><td colspan="14" style="text-align:left;font-style:italic;background:#fafafa">Offline Video LLMs</td></tr>
+              <tr><td style='text-align:left'>Qwen2.5-VL-7B</td><td>1 fps</td><td>67.8</td><td>55.1</td><td>67.2</td><td>42.1</td><td>66.3</td><td>60.9</td><td>59.9</td><td>51.5</td><td>58.8</td><td>23.7</td><td>44.7</td><td>52.28</td></tr>
+              <tr><td style='text-align:left'>LLaVA-Video-7B</td><td>64</td><td>69.1</td><td>58.7</td><td>68.8</td><td>49.4</td><td>74.3</td><td>59.8</td><td>63.5</td><td>56.2</td><td>57.4</td><td>7.5</td><td>40.4</td><td>51.95</td></tr>
+              <tr><td style='text-align:left'>Qwen3-VL-4B</td><td>64</td><td>77.9</td><td class="second">69.7</td><td class="second">77.6</td><td class="second">60.1</td><td>76.2</td><td class="best">75.5</td><td class="second">72.8</td><td class="best">63.0</td><td class="second">66.2</td><td>30.1</td><td class="best">53.1</td><td class="second">63.00</td></tr>
+              <tr><td colspan="14" style="text-align:left;font-style:italic;background:#fafafa">Online / Streaming Video LLMs</td></tr>
+              <tr><td style='text-align:left'>VideoLLM-online-8B</td><td>2 fps</td><td>8.1</td><td>23.9</td><td>12.1</td><td>14.0</td><td>45.5</td><td>21.2</td><td>20.8</td><td>22.2</td><td>18.8</td><td>12.2</td><td>17.7</td><td>19.26</td></tr>
+              <tr><td style='text-align:left'>Flash-VStream-7B</td><td>1 fps</td><td>24.2</td><td>29.4</td><td>28.5</td><td>33.7</td><td>25.7</td><td>28.8</td><td>28.4</td><td>39.1</td><td>37.2</td><td>5.9</td><td>27.4</td><td>27.90</td></tr>
+              <tr><td style='text-align:left'>Dispider-7B</td><td>1 fps</td><td>57.7</td><td>49.5</td><td>62.1</td><td>44.9</td><td>61.4</td><td>51.6</td><td>54.6</td><td>48.5</td><td>55.4</td><td>4.3</td><td>36.1</td><td>45.35</td></tr>
+              <tr><td style='text-align:left'>TimeChat-Online-7B</td><td>1 fps</td><td>75.2</td><td>46.8</td><td>70.7</td><td>47.8</td><td>69.3</td><td>61.4</td><td>61.9</td><td>55.9</td><td>59.5</td><td>9.7</td><td>41.7</td><td>51.80</td></tr>
+              <tr><td style='text-align:left'>StreamForest-7B</td><td>1 fps</td><td>68.5</td><td>53.2</td><td>71.6</td><td>47.8</td><td>65.4</td><td>60.9</td><td>61.2</td><td class="second">58.9</td><td>64.9</td><td>32.3</td><td>52.0</td><td>56.60</td></tr>
+              <tr><td style='text-align:left'>Streamo-7B</td><td>1 fps</td><td>79.2</td><td>57.8</td><td>75.0</td><td>49.4</td><td>64.4</td><td>70.1</td><td>66.0</td><td>54.6</td><td>52.0</td><td>31.7</td><td>46.1</td><td>56.05</td></tr>
+              <tr><td style='text-align:left'>HERMES-7B†</td><td>1 fps</td><td class="second">85.2</td><td>64.2</td><td>71.6</td><td>53.4</td><td class="second">74.3</td><td>65.2</td><td>69.0</td><td>48.5</td><td>62.2</td><td class="best">37.6</td><td>49.4</td><td>59.20</td></tr>
+              <tr><td style='text-align:left'>JoyAI-VL-Interaction-9B</td><td>1 fps</td><td>72.5</td><td>61.5</td><td>75.0</td><td>59.0</td><td class="best">78.2</td><td>64.1</td><td>68.4</td><td>62.0</td><td class="best">70.9</td><td>12.9</td><td>48.6</td><td>58.50</td></tr>
+              <tr><td style='text-align:left'>Mage-VL-4B</td><td>1 fps</td><td class="best">94.63</td><td class="best">83.49</td><td class="best">79.31</td><td class="best">74.16</td><td>70.30</td><td class="second">77.17</td><td class="best">79.84</td><td>50.17</td><td>61.49</td><td class="second">32.80</td><td class="second">48.15</td><td class="best">64.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 class="title is-4" style="margin-top:2rem">Image Understanding &amp; Spatial Intelligence</h2>
+        <div class="table-container m-2">
+          <table class="table is-striped is-hoverable is-fullwidth" id="img-table">
+            <thead>
+              <tr><th>Benchmark</th><th>Mage-VL-4B</th><th>Qwen3-VL-4B</th><th>Phi-4-MM-5.6B</th><th>Phi-4-R-V-15B</th></tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="5" style="text-align:left;font-style:italic;background:#fafafa">Document understanding</td></tr>
+              <tr><td>DocVQA-val</td><td class="best">95.14</td><td class="second">94.69</td><td>92.79</td><td>76.20</td></tr>
+              <tr><td>InfoVQA-val</td><td class="best">80.33</td><td class="second">79.50</td><td>71.84</td><td>55.41</td></tr>
+              <tr><td>AI2D w/ Mask</td><td class="best">83.16</td><td>81.54</td><td>81.83</td><td class="second">82.87</td></tr>
+              <tr><td>AI2D w/o Mask</td><td>91.87</td><td class="second">92.20</td><td>91.35</td><td class="best">93.81</td></tr>
+              <tr><td>ChartQA</td><td class="best">84.88</td><td class="second">83.96</td><td>83.76</td><td>83.40</td></tr>
+              <tr><td>OCRBench</td><td class="best">81.80</td><td>81.60</td><td class="second">81.70</td><td>73.90</td></tr>
+              <tr><td>CC-OCR Doc</td><td class="second">32.25</td><td class="best">39.69</td><td>4.99</td><td>17.65</td></tr>
+              <tr><td>MultiDocVQA-val</td><td class="best">87.46</td><td class="second">87.21</td><td>46.84</td><td>58.35</td></tr>
+              <tr><td>DUDE</td><td class="second">46.44</td><td class="best">50.98</td><td>3.78</td><td>34.34</td></tr>
+              <tr><td>WebSRC-val</td><td class="second">92.80</td><td class="best">95.40</td><td>71.30</td><td>76.60</td></tr>
+              <tr><td>ChartQAPro</td><td class="best">32.57</td><td class="second">26.79</td><td>0.13</td><td>25.38</td></tr>
+              <tr><td>TextVQA-val</td><td class="second">77.28</td><td class="best">80.55</td><td>39.93</td><td>76.06</td></tr>
+              <tr><td>CharXiv-Descr</td><td class="second">75.85</td><td>74.40</td><td>18.65</td><td class="best">75.98</td></tr>
+              <tr><td>CharXiv-Reason</td><td class="second">35.20</td><td>26.10</td><td>0.10</td><td class="best">36.10</td></tr>
+              <tr><td colspan="5" style="text-align:left;font-style:italic;background:#fafafa">General VQA</td></tr>
+              <tr><td>MMBench-EN-dev</td><td class="second">84.02</td><td>83.25</td><td>65.81</td><td class="best">84.19</td></tr>
+              <tr><td>MMBench-CN-dev</td><td class="best">82.04</td><td class="second">80.58</td><td>75.17</td><td>79.47</td></tr>
+              <tr><td>RealWorldQA</td><td>70.46</td><td class="best">70.85</td><td>60.65</td><td class="second">70.72</td></tr>
+              <tr><td>MMStar</td><td class="best">67.32</td><td class="second">62.04</td><td>61.24</td><td>59.63</td></tr>
+              <tr><td>MME-Perception</td><td class="best">1709.54</td><td class="second">1703.50</td><td>1409.66</td><td>1590.21</td></tr>
+              <tr><td>SeedBench (All)</td><td class="best">76.78</td><td class="second">75.65</td><td>68.28</td><td>73.70</td></tr>
+              <tr><td>SeedBench-Image</td><td class="best">79.32</td><td class="second">78.87</td><td>74.48</td><td>77.97</td></tr>
+              <tr><td>SeedBench2-Plus</td><td class="second">69.21</td><td class="best">69.65</td><td>68.38</td><td>69.48</td></tr>
+              <tr><td>MMT-val</td><td>64.47</td><td class="best">66.52</td><td>59.19</td><td class="second">64.89</td></tr>
+              <tr><td>CV-Bench</td><td class="best">87.79</td><td class="second">85.37</td><td>57.09</td><td>81.31</td></tr>
+              <tr><td>MME-RealWorld</td><td class="best">66.52</td><td class="second">63.20</td><td>32.45</td><td>57.80</td></tr>
+              <tr><td>MME-RealWorld-CN</td><td class="second">61.33</td><td class="best">63.09</td><td>21.19</td><td>46.07</td></tr>
+              <tr><td colspan="5" style="text-align:left;font-style:italic;background:#fafafa">Spatial intelligence</td></tr>
+              <tr><td>CV-Bench-2D</td><td class="best">82.13</td><td class="second">81.00</td><td>56.12</td><td>80.11</td></tr>
+              <tr><td>CV-Bench-3D</td><td class="best">94.75</td><td class="second">92.30</td><td>56.92</td><td>82.50</td></tr>
+              <tr><td>BLINK</td><td class="best">65.11</td><td class="second">65.10</td><td>35.24</td><td>57.80</td></tr>
+              <tr><td>EmbSpatial</td><td class="best">82.67</td><td class="second">77.50</td><td>41.51</td><td>72.67</td></tr>
+              <tr><td>CRPE-Relation</td><td class="second">76.12</td><td class="best">77.70</td><td>34.60</td><td>74.46</td></tr>
+              <tr><td>CrossPoint</td><td class="best">80.00</td><td>26.90</td><td>12.20</td><td class="second">47.73</td></tr>
+              <tr><td>ERQA</td><td>36.00</td><td class="best">42.30</td><td>30.75</td><td class="second">40.25</td></tr>
+              <tr><td>MMSI-Bench</td><td>28.20</td><td class="best">31.00</td><td class="second">28.80</td><td>25.70</td></tr>
+              <tr><td>SAT</td><td class="second">67.33</td><td class="best">69.30</td><td>55.33</td><td>66.67</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:.8rem;color:#aaa;margin-top:.5rem">Numbers from the Mage-VL technical report.</p>
+
+        <h2 class="title is-4" style="margin-top:2.5rem">Limitations &amp; Path Forward</h2>
+        <div class="content" style="text-align:left;background:#ffffff;border:1px solid #e5e7eb;border-left:4px solid #e0a800;border-radius:10px;padding:1.1rem 1.4rem;box-shadow:0 2px 6px rgba(0,0,0,.04)">
+          <p style="margin-bottom:.7rem">⚠️ Despite its strong perception and streaming capabilities, Mage-VL still shows a gap to Qwen3-VL on complex <strong>agentic</strong> tasks. This gap largely stems from tight compute budgets, the absence of joint text-multimodal mixed pre-training, and the omission of large-scale RL post-training.</p>
+          <p style="margin-bottom:0"><strong>💡 Zero-Vision SFT as a promising remedy.</strong> Our preliminary study suggests a compute-efficient path: <em>skip visual SFT entirely</em> and replace it with high-quality pure-text reasoning data before applying multimodal RL. On the LLaVA-OV-1.5 Quick Start scale, this <em>Zero-Vision SFT + RL</em> pipeline lifts overall accuracy by <strong>+5.33%</strong> (54.28 vs. 48.96) across 24 benchmarks, wins on <strong>19/24</strong> tasks, and converges with <strong>50.7% fewer RL steps</strong>. Reasoning (<strong>+7.92%</strong> avg.), OCR &amp; Chart (<strong>+9.52%</strong> avg.), and counting all benefit substantially, indicating that preserving intrinsic textual reasoning during instruction tuning unlocks stronger multimodal RL and offers a practical route to close the agentic gap.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ══ CONTRIBUTORS ══ -->
+<section class="section rf-contributors-section" id="contributors">
+  <div class="container is-max-desktop content has-text-centered">
+    <h2 class="title is-3">Contributors</h2>
+    <div class="rf-publication-authors" aria-label="Mage-VL contributors">
+      <p class="rf-author-list">
+        <span class="rf-author"><a href="https://senqiaoyang.com/" target="_blank" rel="noopener">Senqiao Yang<sup>*</sup></a></span>,
+        <span class="rf-author"><a href="https://kcz358.github.io/" target="_blank" rel="noopener">Kaichen Zhang<sup>*</sup></a></span>,
+        <span class="rf-author"><a href="https://scholar.google.com/citations?user=ObkbCWkAAAAJ&amp;hl=zh-CN" target="_blank" rel="noopener">Zhaoyang Jia<sup>*</sup></a></span>,
+        <span class="rf-author"><a href="https://github.com/Jinghao-Guo" target="_blank" rel="noopener">Jinghao Guo<sup>*</sup></a></span>,
+        <span class="rf-author">Yifei Shen<sup>*†</sup></span>,
+        <span class="rf-author"><a href="https://xinjie-q.github.io/" target="_blank" rel="noopener">Xinjie Zhang<sup>*†</sup></a></span>,
+        <span class="rf-author"><a href="https://www.microsoft.com/en-us/research/people/xiaoyizhang/" target="_blank" rel="noopener">Xiaoyi Zhang</a></span>,
+        <span class="rf-author"><a href="https://hqhq1025.github.io/" target="_blank" rel="noopener">Haoqing Wang</a></span>,
+        <span class="rf-author"><a href="https://pableeto.github.io/" target="_blank" rel="noopener">Xiao Li</a></span>,
+        <span class="rf-author"><a href="https://scholar.google.com/citations?user=0mwuIw8AAAAJ&amp;hl=en" target="_blank" rel="noopener">Peng Zhang</a></span>,
+        <span class="rf-author">Xiang An</span>,
+        <span class="rf-author">Yin Xie</span>,
+        <span class="rf-author"><a href="https://www.liuzhening.top/" target="_blank" rel="noopener">Zhening Liu</a></span>,
+        <span class="rf-author"><a href="https://www.microsoft.com/en-us/research/people/xunguo/" target="_blank" rel="noopener">Xun Guo</a></span>,
+        <span class="rf-author"><a href="https://www.microsoft.com/en-us/research/people/jiahali/" target="_blank" rel="noopener">Jiahao Li</a></span>,
+        <span class="rf-author">Shicheng Zheng</span>,
+        <span class="rf-author"><a href="https://jingluw.github.io/" target="_blank" rel="noopener">Jinglu Wang</a></span>,
+        <span class="rf-author"><a href="https://zongyuguo.github.io/" target="_blank" rel="noopener">Zongyu Guo</a></span>,
+        <span class="rf-author"><a href="https://www.microsoft.com/en-us/research/people/wenxie/" target="_blank" rel="noopener">Wenxuan Xie</a></span>,
+        <span class="rf-author">Zihan Zheng</span>,
+        <span class="rf-author"><a href="https://loyuxr.github.io/" target="_blank" rel="noopener">Yuxuan Luo</a></span>,
+        <span class="rf-author"><a href="https://www.microsoft.com/en-us/research/people/libin/" target="_blank" rel="noopener">Bin Li</a></span>,
+        <span class="rf-author"><a href="https://www.microsoft.com/en-us/research/people/yanlu/" target="_blank" rel="noopener">Yan Lu</a></span>
+      </p>
+      <p class="rf-author-notes"><sup>*</sup> Equal Contribution. <span aria-hidden="true">·</span> <sup>†</sup> Project Leads (<a href="mailto:yshenaw@connect.ust.hk">yshenaw@connect.ust.hk</a>, <a href="mailto:xinjiezhang@microsoft.com">xinjiezhang@microsoft.com</a>).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BIBTEX ══ -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title is-3 has-text-centered">BibTeX 📚</h2>
+    <pre><code>@article{yang2026magevl,
+  title={Mage-VL: An Efficient Codec-Native Streaming Multimodal Foundation Model},
+  author={Yang, Senqiao and Zhang, Kaichen and Jia, Zhaoyang and Guo, Jinghao and Shen, Yifei and Zhang, Xinjie and Zhang, Xiaoyi and Wang, Haoqing and Li, Xiao and Zhang, Peng and An, Xiang and Xie, Yin and Liu, Zhening and Guo, Xun and Li, Jiahao and Zheng, Shicheng and Wang, Jinglu and Guo, Zongyu and Xie, Wenxuan and Zheng, Zihan and Luo, Yuxuan and Li, Bin and Lu, Yan},
+  journal={arXiv preprint},
+  year={2026}
+}</code></pre>
+  </div>
+</section>
+
   </main>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>This page was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page template.
+          &nbsp;·&nbsp; <a href="https://go.microsoft.com/fwlink/?LinkId=521839" target="_blank">Privacy</a>
+          &nbsp;·&nbsp; © 2026 Microsoft</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ SCRIPTS ══ -->
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  GLightbox({ selector:'.glightbox', touchNavigation:true, loop:true });
+
+  var streamVideo = document.getElementById('streammind-video');
+  var transcript = document.getElementById('stream-transcript');
+  var waiting = document.getElementById('stream-waiting');
+  var clock = document.getElementById('stream-clock');
+  var demos = [
+    {
+      title:'England vs. Argentina · 2026 World Cup',
+      meta:'03:00 · codec backend · 30-second causal windows',
+      video:'static/videos/world-cup-streaming.mp4',
+      events:[
+        {time:30, prob:.85, text:'Argentina prepares a set piece as England organizes its defense in front of goal.'},
+        {time:60, prob:.85, text:'A headed attempt flashes toward goal; the replay follows the ball past the goalkeeper and confirms the scoring chance.'},
+        {time:120, prob:.83, text:'At full time, players from England and Argentina shake hands and embrace in a display of sportsmanship.'}
+      ]
+    },
+    {
+      title:'Culture & Travel', meta:'03:00 · codec backend · 30-second causal windows',
+      video:'static/videos/culture-streaming.mp4',
+      events:[
+        {time:30, prob:.50, text:'The film moves from a lively nighttime gathering to a serene underwater scene, where a swimmer glides through clear water.'},
+        {time:90, prob:.66, text:'A vibrant reef gives way to people in traditional clothing, followed by scenes of work and daily life outdoors.'},
+        {time:120, prob:.51, text:'A child walks with an adult before the camera follows people through a narrow neighborhood alley.'},
+        {time:150, prob:.56, text:'Families play in a shallow river surrounded by greenery, then the montage shifts to candlelight and fields of golden grass.'}
+      ]
+    },
+    {
+      title:'Inside the Cockpit', meta:'03:00 · codec backend · 30-second causal windows',
+      video:'static/videos/aviation-streaming.mp4',
+      events:[{time:150, prob:.81, text:'Inside the cockpit, two pilots monitor the instruments while the captain gestures and talks through the flight.'}]
+    }
+  ];
+  var activeDemo = demos[0];
+  var visibleEventCount = -1;
+  function formatStreamTime(seconds){
+    var value = Math.max(0, Math.floor(seconds || 0));
+    return String(Math.floor(value/60)).padStart(2,'0') + ':' + String(value%60).padStart(2,'0');
+  }
+  function updateTranscript(){
+    if(!streamVideo || !transcript) return;
+    var current = streamVideo.currentTime || 0;
+    clock.textContent = formatStreamTime(current);
+    var visible = activeDemo.events.filter(function(item){ return item.time <= current; });
+    if(visible.length !== visibleEventCount){
+      visibleEventCount = visible.length;
+      transcript.innerHTML = visible.map(function(item, index){
+        return '<article class="stream-event visible" style="--delay:'+(index*.05)+'s">' +
+          '<span class="stream-time">'+formatStreamTime(item.time)+' · gate p='+item.prob.toFixed(2)+'</span>' +
+          '<span class="stream-caption">'+item.text+'</span></article>';
+      }).join('');
+      waiting.hidden = visible.length > 0;
+      if(visible.length) transcript.lastElementChild.scrollIntoView({block:'nearest',behavior:'smooth'});
+    }
+  }
+  function selectStreamDemo(index){
+    activeDemo = demos[index];
+    visibleEventCount = -1;
+    streamVideo.pause();
+    streamVideo.src = activeDemo.video;
+    streamVideo.load();
+    document.getElementById('stream-demo-title').textContent = activeDemo.title;
+    document.getElementById('stream-demo-meta').textContent = activeDemo.meta;
+    document.querySelectorAll('.stream-demo-tab').forEach(function(tab, i){ tab.classList.toggle('active', i === index); });
+    updateTranscript();
+  }
+  if(streamVideo){
+    streamVideo.addEventListener('timeupdate', updateTranscript);
+    streamVideo.addEventListener('seeked', updateTranscript);
+  }
+  document.querySelectorAll('.stream-demo-tab').forEach(function(tab){
+    tab.addEventListener('click', function(){ selectStreamDemo(Number(tab.getAttribute('data-demo'))); });
+  });
+  updateTranscript();
+
+  ['vid-table','spa-table','img-table'].forEach(function(tableId){
+    var table = document.getElementById(tableId);
+    if(!table) return;
+    var headers = Array.from(table.querySelectorAll('thead th'));
+    var baseTxts = headers.map(function(h){ return h.textContent.trim(); });
+    var activeIdx = -1, activeAsc = true;
+    headers.forEach(function(th, idx){
+      th.addEventListener('click', function(){
+        var tbody = table.querySelector('tbody');
+        var rows = Array.from(tbody.querySelectorAll('tr'));
+        var asc = (activeIdx === idx) ? !activeAsc : true;
+        rows.sort(function(a,b){
+          var av = a.children[idx] ? a.children[idx].textContent.replace(/[↑↓+]/g,'').trim() : '';
+          var bv = b.children[idx] ? b.children[idx].textContent.replace(/[↑↓+]/g,'').trim() : '';
+          var an = parseFloat(av), bn = parseFloat(bv);
+          return asc ? (isNaN(an)||isNaN(bn) ? av.localeCompare(bv) : an-bn)
+                     : (isNaN(an)||isNaN(bn) ? bv.localeCompare(av) : bn-an);
+        });
+        rows.forEach(function(r){ tbody.appendChild(r); });
+        headers.forEach(function(h,i){ h.textContent = baseTxts[i]; });
+        th.textContent = baseTxts[idx] + (asc ? ' ↑' : ' ↓');
+        activeIdx = idx; activeAsc = asc;
+      });
+    });
+  });
+});
+
+function showFeature(idx, color, ev){
+  var container = ev && ev.currentTarget ? ev.currentTarget.closest('.feature-container') : document.querySelector('.feature-container');
+  if(!container) return;
+  var tabs = container.querySelectorAll('.feature-tab');
+  var panels = container.querySelectorAll('.feature-panel');
+  tabs.forEach(function(t){ t.classList.remove('active-blue','active-amber','active-purple','active-teal','active-rose','active-indigo'); });
+  panels.forEach(function(p){ p.classList.remove('active'); });
+  if(tabs[idx]) tabs[idx].classList.add('active-'+color);
+  if(panels[idx]) panels[idx].classList.add('active');
+}
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.feature-container').forEach(function(c){
+    var first = c.querySelector('.feature-tab');
+    if(!first) return;
+    var color = first.getAttribute('data-color') || 'blue';
+    first.classList.add('active-'+color);
+    var firstPanel = c.querySelector('.feature-panel');
+    if(firstPanel) firstPanel.classList.add('active');
+  });
+});
+</script>
+
 </body>
 </html>
